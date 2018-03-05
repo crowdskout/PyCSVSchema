@@ -63,7 +63,7 @@
       "description": "The enum keyword for string field fields",
       "allOf": [
         {
-          "$ref": "enum-type"
+          "$ref": "#/definitions/enum-type"
         },
         {
           "items": {
@@ -113,7 +113,7 @@
       "description": "The enum keyword for boolean type fields",
       "allOf": [
         {
-          "$ref": "enum-type"
+          "$ref": "#/definitions/enum-type"
         },
         {
           "items": {

@@ -7,7 +7,7 @@ import json
 import jsonschema
 from pycsvschema.validators import header_validators
 from pycsvschema import defaults, _utilities
-import asyncio
+from typing import Dict, Optional
 
 
 class Validator:
@@ -22,23 +22,30 @@ class Validator:
         'strict': False
     }
 
-    def __init__(self, schema, filename, output=None, errors='raise', **kwargs):
+    def __init__(self, csvfile: str, schema: Dict, output: Optional[str]=None, errors: str='raise', **kwargs):
+        """
+        :param csvfile: Path to CSV file
+        :param schema: CSV Schema in dict
+        :param output: Path to output file of errors. If output is None, print the error message. Default: None.
+        :param error: {'raise', 'coerce'} If error is 'raise', stop the validation when it meets the first error. If
+        error is 'coerce', output all errors.
+
+        Validator also accepts parameters of csv.reader, that includes delimiter, doublequote, escapechar,
+        lineterminator, quotechar, quoting, skipinitialspace and strict
+        See details on https://docs.python.org/3/library/csv.html#dialects-and-formatting-parameters
         """
 
-        :param schema:
-        :type schema: dict
-        """
+        self.csvfile = csvfile
+
         self.schema = schema
-
-        self.filename = filename
-
-        self.header = []
 
         self.output = output
 
         if errors not in {'raise', 'coerce'}:
             raise ValueError("Unknown value for parameter errors")
         self.errors = errors
+
+        self.header = []
         
         self.csv_pars = {
             **self._CSV_DEFAULT_PARS,
@@ -65,8 +72,20 @@ class Validator:
             self.schema['missingValues'] = defaults.MISSINGVALUES
         self.schema['missingValues'] = set(self.schema['missingValues'])
 
+        # enum in fields, definitions and patternFields
+        fields_schema = (
+            self.schema['fields'],
+            self.schema['definitions'].values(),
+            self.schema['patternFields'].values()
+        )
+        for fields in fields_schema:
+            for field in fields:
+                if 'enum' not in field.keys():
+                    continue
+                field['enum'] = set(field['enum'])
+
     def validate(self):
-        with open(self.filename, 'r') as csvfile:
+        with open(self.csvfile, 'r') as csvfile:
             csv_reader = csv.reader(csvfile, **self.csv_pars)
 
             # Read first line as header
@@ -175,71 +194,3 @@ class Validator:
                     # Type validator convert cell value into target type, other validators don't accept None value
                     # if validator is row_validators.field_type or c['value'] is not None:
                     yield from validator(c, self.schema, column_info['field_schema'])
-
-
-class AsyncValidator(Validator):
-    def __init__(self, schema, filename, chunksize, **kwargs):
-        super().__init__(schema, filename, **kwargs)
-        self.chunksize = chunksize
-
-    async def check_rows(self, csvreader):
-        # split csv into
-        # [(1, [row_1,..]), (2, [row_2,..]),..,(chunksize, [row_chunksize,])], ...
-        for chunk in _utilities.step_slice(enumerate(csvreader), self.chunksize):
-            coros = [self._check_row(row, line_num) for line_num, row in chunk]
-            for future in asyncio.as_completed(coros):
-                yield await future
-
-    async def _check_row(self, row, row_num):
-        future = asyncio.Future()
-        result = []
-        for index, column_info in self.column_validators['columns'].items():
-            c = {'value': row[index], 'row': row_num + 1, 'column': self.header[index]}
-
-            # Update c.value to None if value is in missingValues
-            for error in header_validators.missingvalues(c, self.schema, self.column_validators):
-                result.append(error)
-
-            for validator in column_info['validators']:
-                # Type validator convert cell value into target type, other validators don't accept None value
-                # if validator is row_validators.field_type or c['value'] is not None:
-                for error in validator(c, self.schema, column_info['field_schema']):
-                    result.append(error)
-        future.set_result(result)
-        return future
-
-    async def row_error_consumer(self, output, errors):
-        async for error in errors:
-            for r in error.result():
-                if self.errors == 'raise':
-                    raise r
-                else:
-                    output.write(str(r))
-                    output.write('\n')
-
-    def validate(self):
-        self.validate_schema()
-
-        with open(self.filename, 'r') as csvfile:
-            csv_reader = csv.reader(csvfile, **self.csv_pars)
-
-            # Read first line as header
-            self.header = next(csv_reader)
-            self.prepare_field_schema()
-
-            with _utilities.file_writer(self.output) as output:
-                # Concat errors from header checking and row checking
-                for error in chain(self.check_header()):
-                    if self.errors == 'raise':
-                        raise error
-                    else:
-                        output.write(str(error))
-                        output.write('\n')
-
-                self.async_check_row(output, csv_reader)
-
-    def async_check_row(self, output, csv_reader):
-        main = self.row_error_consumer(output, self.check_rows(csv_reader))
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(main)
-        loop.close()
