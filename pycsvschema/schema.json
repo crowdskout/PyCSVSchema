@@ -1,0 +1,627 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CSV Schema",
+  "description": "This is meta-schema of CSV Schema.",
+  "type": "object",
+  "definitions": {
+    "enum-type": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "positive-number": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "fields-name": {
+      "description": "Name of the field.",
+      "type": "string"
+    },
+    "fields-required": {
+      "description": "Whether this field is required.",
+      "type": "boolean",
+      "default": false
+    },
+    "fields-nullable": {
+      "description": "Whether this field is nullable.",
+      "type": "boolean",
+      "default": true
+    },
+    "fields-type-string": {
+      "description": "The type keyword, which MUST have a value of `string`.",
+      "type": "string",
+      "enum": [
+        "string"
+      ]
+    },
+    "fields-type-string-format": {
+      "description": "The format keyword for string field.",
+      "type": "string",
+      "enum": [
+        "email",
+        "datetime",
+        "hostname",
+        "ipv4",
+        "ipv6",
+        "uri",
+        "uuid"
+      ]
+    },
+    "fields-type-string-pattern": {
+      "description": "The pattern keyword for string field.",
+      "type": "string"
+    },
+    "fields-type-string-minLength": {
+      "description": "The minLength keyword for string field.",
+      "$ref": "#/definitions/positive-number"
+    },
+    "fields-type-string-maxLength": {
+      "description": "The minLength keyword for string field.",
+      "type": "integer"
+    },
+    "fields-type-string-enum": {
+      "description": "The enum keyword for string field fields",
+      "allOf": [
+        {
+          "$ref": "enum-type"
+        },
+        {
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "fields-type-boolean": {
+      "description": "The type keyword, which MUST have a value of `boolean`.",
+      "type": "string",
+      "enum": [
+        "boolean"
+      ]
+    },
+    "fields-type-boolean-falseValues": {
+      "title": "FalseValues For Boolean Type",
+      "description": "The falseValues keyword for boolean type fields",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": ["string", "null"]
+      },
+      "default": [
+        "FALSE",
+        "False",
+        "false",
+        "0"
+      ]
+    },
+    "fields-type-boolean-trueValues": {
+      "title": "FalseValues For Boolean Type",
+      "description": "The trueValues keyword for boolean type fields",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": ["string", "null"]
+      },
+      "default": [
+        "TRUE",
+        "True",
+        "true",
+        "1"
+      ]
+    },
+    "fields-type-boolean-enum": {
+      "description": "The enum keyword for boolean type fields",
+      "allOf": [
+        {
+          "$ref": "enum-type"
+        },
+        {
+          "items": {
+            "type": "boolean"
+          }
+        }
+      ]
+    },
+    "fields-type-number": {
+      "title": "Number Type Field",
+      "description": "The type keyword, which MUST have a value of `number`.",
+      "type": "string",
+      "enum": [
+        "number"
+      ]
+    },
+    "fields-type-number-integer-exclusiveMaximum": {
+      "description": "The exclusiveMaximum keyword for number and integer type.",
+      "type": "boolean"
+    },
+    "fields-type-number-integer-exclusiveMinimum": {
+      "description": "The exclusiveMinimum keyword for number and integer type.",
+      "type": "boolean"
+    },
+    "fields-type-number-integer-maximum": {
+      "description": "The maximum keywordfor number and integer type.",
+      "type": "integer"
+    },
+    "fields-type-number-integer-minimum": {
+      "description": "The minimum keywordfor number and integer type.",
+      "type": "integer"
+    },
+    "fields-type-number-integer-multipleOf": {
+      "description": "The multipleOf keywordfor number and integer type.",
+      "$ref": "#/definitions/positive-number"
+    },
+    "fields-type-number-integer-groupChar": {
+      "description": "The groupChar keywordfor number and integer type.",
+      "type": "string"
+    },
+    "fields-type-number-enum": {
+      "description": "The enum keywordfor number type.",
+      "allOf": [
+        {
+          "$ref": "enum-type"
+        },
+        {
+          "items": {
+            "type": "number"
+          }
+        }
+      ]
+    },
+    "fields-type-integer": {
+      "title": "Integer Type Field",
+      "description": "The type keyword, which MUST have a value of `integer`.",
+      "type": "string",
+      "enum": [
+        "integer"
+      ]
+    },
+    "fields-type-integer-enum": {
+      "description": "The enum keywordfor integer type.",
+      "allOf": [
+        {
+          "$ref": "enum-type"
+        },
+        {
+          "items": {
+            "type": "integer"
+          }
+        }
+      ]
+    },
+    "ref-fields-type-string": {
+      "type": "object",
+      "title": "String Type Field",
+      "description": "The string type field for `definitions` and `patternFields`. Similar to fields-type-string but it does not have `name` keyword.",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/fields-type-string"
+        },
+        "format": {
+          "$ref": "#/definitions/fields-type-string-format"
+        },
+        "pattern": {
+          "$ref": "#/definitions/fields-type-string-pattern"
+        },
+        "minLength": {
+          "$ref": "#/definitions/fields-type-string-minLength"
+        },
+        "maxLength": {
+          "$ref": "#/definitions/fields-type-string-maxLength"
+        },
+        "enum": {
+          "$ref": "#/definitions/fields-type-string-enum"
+        },
+        "required": {
+          "$ref": "#/definitions/fields-required"
+        },
+        "nullable": {
+          "$ref": "#/definitions/fields-nullable"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ref-fields-type-boolean": {
+      "type": "object",
+      "title": "Boolean Type Field",
+      "description": "The boolean type field for `definitions` and `patternFields`. Similar to fields-type-string but it does not have `name` keyword.",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/fields-type-boolean"
+        },
+        "trueValues": {
+          "$ref": "#/definitions/fields-type-boolean-trueValues"
+        },
+        "falseValues": {
+          "$ref": "#/definitions/fields-type-boolean-falseValues"
+        },
+        "enum": {
+          "$ref": "#/definitions/fields-type-boolean-enum"
+        },
+        "required": {
+          "$ref": "#/definitions/fields-required"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ref-fields-type-number": {
+      "type": "object",
+      "title": "Number Type Field",
+      "description": "The number type field for `definitions` and `patternFields`. Similar to fields-type-string but it does not have `name` keyword.",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/fields-type-number"
+        },
+        "exclusiveMaximum": {
+          "$ref": "#/definitions/fields-type-number-integer-exclusiveMaximum"
+        },
+        "exclusiveMinimum": {
+          "$ref": "#/definitions/fields-type-number-integer-exclusiveMinimum"
+        },
+        "maximum": {
+          "$ref": "#/definitions/fields-type-number-integer-maximum"
+        },
+        "minimum": {
+          "$ref": "#/definitions/fields-type-number-integer-minimum"
+        },
+        "multipleOf": {
+          "$ref": "#/definitions/fields-type-number-integer-multipleOf"
+        },
+        "groupChar": {
+          "$ref": "#/definitions/fields-type-number-integer-groupChar"
+        },
+        "enum": {
+          "$ref": "#/definitions/fields-type-number-enum"
+        },
+        "required": {
+          "$ref": "#/definitions/fields-required"
+        },
+        "nullable": {
+          "$ref": "#/definitions/fields-nullable"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ref-fields-type-integer": {
+      "type": "object",
+      "title": "Integer Type Field",
+      "description": "The integer type field for `definitions` and `patternFields`. Similar to fields-type-string but it does not have `name` keyword.",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/fields-name"
+        },
+        "type": {
+          "$ref": "#/definitions/fields-type-number"
+        },
+        "exclusiveMaximum": {
+          "$ref": "#/definitions/fields-type-number-integer-exclusiveMaximum"
+        },
+        "exclusiveMinimum": {
+          "$ref": "#/definitions/fields-type-number-integer-exclusiveMinimum"
+        },
+        "maximum": {
+          "$ref": "#/definitions/fields-type-number-integer-maximum"
+        },
+        "minimum": {
+          "$ref": "#/definitions/fields-type-number-integer-minimum"
+        },
+        "multipleOf": {
+          "$ref": "#/definitions/fields-type-number-integer-multipleOf"
+        },
+        "groupChar": {
+          "$ref": "#/definitions/fields-type-number-integer-groupChar"
+        },
+        "enum": {
+          "$ref": "#/definitions/fields-type-integer-enum"
+        },
+        "required": {
+          "$ref": "#/definitions/fields-required"
+        },
+        "nullable": {
+          "$ref": "#/definitions/fields-nullable"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ref-fields-ref": {
+      "type": "object",
+      "title": "Field Using ref keyword",
+      "description": "The field under `fields` which has `ref` keyword but no `name` keyword.",
+      "required": [
+        "$ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "$ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "properties": {
+    "fields": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "anyOf": [
+          {
+            "type": "object",
+            "title": "String Type Field",
+            "description": "The string type field under `fields`.",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "$ref": "#/definitions/fields-name"
+              },
+              "type": {
+                "$ref": "#/definitions/fields-type-string"
+              },
+              "format": {
+                "$ref": "#/definitions/fields-type-string-format"
+              },
+              "pattern": {
+                "$ref": "#/definitions/fields-type-string-pattern"
+              },
+              "minLength": {
+                "$ref": "#/definitions/fields-type-string-minLength"
+              },
+              "maxLength": {
+                "$ref": "#/definitions/fields-type-string-maxLength"
+              },
+              "enum": {
+                "$ref": "#/definitions/fields-type-string-enum"
+              },
+              "required": {
+                "$ref": "#/definitions/fields-required"
+              },
+              "nullable": {
+                "$ref": "#/definitions/fields-nullable"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "title": "Boolean Type Field",
+            "description": "The boolean type field under `fields`.",
+            "required": [
+              "name",
+              "type"
+            ],
+            "properties": {
+              "name": {
+                "$ref": "#/definitions/fields-name"
+              },
+              "type": {
+                "$ref": "#/definitions/fields-type-boolean"
+              },
+              "trueValues": {
+                "$ref": "#/definitions/fields-type-boolean-trueValues"
+              },
+              "falseValues": {
+                "$ref": "#/definitions/fields-type-boolean-falseValues"
+              },
+              "enum": {
+                "$ref": "#/definitions/fields-type-boolean-enum"
+              },
+              "required": {
+                "$ref": "#/definitions/fields-required"
+              },
+              "nullable": {
+                "$ref": "#/definitions/fields-nullable"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "title": "Number Type Field",
+            "description": "The number type field under `fields`.",
+            "required": [
+              "name",
+              "type"
+            ],
+            "properties": {
+              "name": {
+                "$ref": "#/definitions/fields-name"
+              },
+              "type": {
+                "$ref": "#/definitions/fields-type-number"
+              },
+              "exclusiveMaximum": {
+                "$ref": "#/definitions/fields-type-number-integer-exclusiveMaximum"
+              },
+              "exclusiveMinimum": {
+                "$ref": "#/definitions/fields-type-number-integer-exclusiveMinimum"
+              },
+              "maximum": {
+                "$ref": "#/definitions/fields-type-number-integer-maximum"
+              },
+              "minimum": {
+                "$ref": "#/definitions/fields-type-number-integer-minimum"
+              },
+              "multipleOf": {
+                "$ref": "#/definitions/fields-type-number-integer-multipleOf"
+              },
+              "groupChar": {
+                "$ref": "#/definitions/fields-type-number-integer-groupChar"
+              },
+              "enum": {
+                "$ref": "#/definitions/fields-type-number-enum"
+              },
+              "required": {
+                "$ref": "#/definitions/fields-required"
+              },
+              "nullable": {
+                "$ref": "#/definitions/fields-nullable"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "title": "Integer Type Field",
+            "description": "The integer type field under `fields`.",
+            "required": [
+              "name",
+              "type"
+            ],
+            "properties": {
+              "name": {
+                "$ref": "#/definitions/fields-name"
+              },
+              "type": {
+                "$ref": "#/definitions/fields-type-number"
+              },
+              "exclusiveMaximum": {
+                "$ref": "#/definitions/fields-type-number-integer-exclusiveMaximum"
+              },
+              "exclusiveMinimum": {
+                "$ref": "#/definitions/fields-type-number-integer-exclusiveMinimum"
+              },
+              "maximum": {
+                "$ref": "#/definitions/fields-type-number-integer-maximum"
+              },
+              "minimum": {
+                "$ref": "#/definitions/fields-type-number-integer-minimum"
+              },
+              "multipleOf": {
+                "$ref": "#/definitions/fields-type-number-integer-multipleOf"
+              },
+              "groupChar": {
+                "$ref": "#/definitions/fields-type-number-integer-groupChar"
+              },
+              "enum": {
+                "$ref": "#/definitions/fields-type-integer-enum"
+              },
+              "required": {
+                "$ref": "#/definitions/fields-required"
+              },
+              "nullable": {
+                "$ref": "#/definitions/fields-nullable"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "title": "Field Using ref keyword",
+            "description": "The field under `fields` which has ref keyword.",
+            "required": [
+              "name",
+              "$ref"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "$ref": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        ]
+      }
+    },
+    "missingValues": {
+      "description": "Consider given strings as missing values and convert them into null.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      },
+      "default": [
+        ""
+      ]
+    },
+    "definitions": {
+      "description": "Define fields but not bound to any column.",
+      "type": "object",
+      "additionalProperties": true,
+      "patternProperties": {
+        "^.*$": {
+          "type": "object",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ref-fields-type-string"
+            },
+            {
+              "$ref": "#/definitions/ref-fields-type-boolean"
+            },
+            {
+              "$ref": "#/definitions/ref-fields-type-number"
+            },
+            {
+              "$ref": "#/definitions/ref-fields-type-integer"
+            }
+          ]
+        }
+      }
+    },
+    "exactFields": {
+      "type": "boolean",
+      "description": "Use the fields defined in fields as required columns, including the order.",
+      "default": false
+    },
+    "dependencies": {
+      "description": "Define dependencies among fields.",
+      "type": "object",
+      "additionalProperties": true,
+      "patternProperties": {
+        "^.*$": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "patternFields": {
+      "description": "Use regex to match and define fields.",
+      "type": "object",
+      "additionalProperties": true,
+      "patternProperties": {
+        "^.*$": {
+          "type": "object",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ref-fields-type-string"
+            },
+            {
+              "$ref": "#/definitions/ref-fields-type-boolean"
+            },
+            {
+              "$ref": "#/definitions/ref-fields-type-number"
+            },
+            {
+              "$ref": "#/definitions/ref-fields-type-integer"
+            },
+            {
+              "$ref": "#/definitions/ref-fields-ref"
+            }
+          ]
+        }
+      }
+    },
+    "additionalFields": {
+      "description": "Whether to allow column not defined in fields or patternFields exists.",
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "additionalProperties": false
+}
