@@ -124,7 +124,6 @@ def missingvalues(cell, schema, column_validators):
     missingvalues is not a validator, but only cell value into None if it's in missing value list
     :param cell: cell data in dict like {'value': 1}, only for missingvalues
     """
-    # TODO: DEFAULT_MISSINGVALUES would not be triggered here, how to apply it?
     if cell['value'] in schema.get('missingValues', defaults.MISSINGVALUES):
         cell['value'] = None
     yield from ()

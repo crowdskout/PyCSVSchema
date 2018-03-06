@@ -85,7 +85,7 @@ class StringValidator(TypeValidator):
             if not re.match(self.HOSTNAME_PATTERN, value):
                 return False
         elif self.format == 'datetime':
-            self.pattern = self.field_schema.get('pattern', defaults.FIELDS_FORMAT_DATETIME_PATTERN)
+            self.pattern = self.field_schema.get('datetimePattern', defaults.FIELDS_FORMAT_DATETIME_PATTERN)
             try:
                 datetime.datetime.strptime(value, self.pattern)
             except Exception:

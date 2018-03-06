@@ -73,16 +73,17 @@ class Validator:
         self.schema['missingValues'] = set(self.schema['missingValues'])
 
         # enum in fields, definitions and patternFields
-        fields_schema = (
+        fields_schema_with_array = (
             self.schema['fields'],
             self.schema['definitions'].values(),
             self.schema['patternFields'].values()
         )
-        for fields in fields_schema:
+        array_keywords = ('trueValues', 'falseValues', 'enum')
+        for fields in fields_schema_with_array:
             for field in fields:
-                if 'enum' not in field.keys():
-                    continue
-                field['enum'] = set(field['enum'])
+                for k in array_keywords:
+                    if k in field.keys():
+                        field[k] = set(field[k])
 
     def validate(self):
         with open(self.csvfile, 'r') as csvfile:
