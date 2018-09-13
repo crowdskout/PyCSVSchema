@@ -23,7 +23,7 @@ setup(name='pycsvschema',
 
       license='MIT',
 
-      py_modules=['pycsvschema'],
+      packages=['pycsvschema'],
 
       classifiers=[
           'Development Status :: 5 - Production/Stable',
