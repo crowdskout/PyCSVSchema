@@ -18,7 +18,6 @@
 # boolean
 #
 
-
 import rfc3986
 import re
 import uuid

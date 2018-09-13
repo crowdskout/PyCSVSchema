@@ -11,7 +11,7 @@ with open('README_pypi.rst') as f:
 
 setup(name='pycsvschema',
 
-      version='0.0.2',
+      version='0.0.3',
 
       description='PyCSVSchema is an implementation of CSV Schema in Python.',
 

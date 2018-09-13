@@ -22,7 +22,7 @@ class Validator:
         'strict': False
     }
 
-    def __init__(self, csvfile: str, schema: Dict, output: Optional[str]=None, errors: str='raise', **kwargs):
+    def __init__(self, csvfile: str, schema: Dict, output: Optional[str] = None, errors: str = 'raise', **kwargs):
         """
         :param csvfile: Path to CSV file
         :param schema: CSV Schema in dict
@@ -46,16 +46,14 @@ class Validator:
         self.errors = errors
 
         self.header = []
-        
+
         self.csv_pars = {
             **self._CSV_DEFAULT_PARS,
-            **{k: kwargs[k] for k in set(kwargs).intersection(self._CSV_DEFAULT_PARS)}
+            **{k: kwargs[k]
+               for k in set(kwargs).intersection(self._CSV_DEFAULT_PARS)}
         }
 
-        self.column_validators = {
-            'columns': {},
-            'unfoundfields': {}
-        }
+        self.column_validators = {'columns': {}, 'unfoundfields': {}}
 
         self.validate_schema()
 
@@ -74,9 +72,7 @@ class Validator:
 
         # enum in fields, definitions and patternFields
         fields_schema_with_array = (
-            self.schema['fields'],
-            self.schema['definitions'].values(),
-            self.schema['patternFields'].values()
+            self.schema['fields'], self.schema['definitions'].values(), self.schema['patternFields'].values()
         )
         array_keywords = ('trueValues', 'falseValues', 'enum')
         for fields in fields_schema_with_array:
@@ -161,10 +157,7 @@ class Validator:
                 header_index[v] = [k]
 
         for field_schema in self.schema.get('fields', defaults.FIELDS):
-            column_info = {
-                'field_schema': field_schema,
-                'column': field_schema['name']
-            }
+            column_info = {'field_schema': field_schema, 'column': field_schema['name']}
 
             _utilities.find_row_validators(column_info=column_info, field_schema=field_schema)
 
@@ -183,7 +176,7 @@ class Validator:
 
         yield from header_validators.field_required(self.header, self.schema, self.column_validators)
 
-    def check_rows(self, csvreader):
+    def check_rows(self, csvreader, callback=lambda *args: None):
         for line_num, row in enumerate(csvreader):
             for index, column_info in self.column_validators['columns'].items():
                 c = {'value': row[index], 'row': line_num + 1, 'column': self.header[index]}
@@ -195,3 +188,10 @@ class Validator:
                     # Type validator convert cell value into target type, other validators don't accept None value
                     # if validator is row_validators.field_type or c['value'] is not None:
                     yield from validator(c, self.schema, column_info['field_schema'])
+
+            callback(line_num, row)
+
+
+class CSV2JSON(Validator):
+    def __init__(self, csvfile: str, schema: Dict, output: Optional[str], **kwargs):
+        super(CSV2JSON, self).__init__(csvfile, schema, output, **kwargs)

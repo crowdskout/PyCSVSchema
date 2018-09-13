@@ -32,6 +32,12 @@ Traceback (most recent call last):
 <ValidationError: 'Value 14.0 is not multiple of 5'; column: value; row: 3>
 ```
 
+## Installation
+
+```bash
+pip install pycsvschema
+```
+
 ## Requirements
 
 Python 3.5 or above

@@ -6,7 +6,6 @@ import re
 from pycsvschema import exceptions
 from pycsvschema import defaults, _utilities
 
-
 # Validators for root options
 # Each validator should be a generator, accepting three parameters:
 # :param header: csv header
@@ -26,9 +25,7 @@ def additionalfields(header, schema, column_validators):
             if re.match(regex, extra_field):
                 matched = True
         if matched is False:
-            yield exceptions.ValidationError(
-                message="Field {0} is not defined".format(extra_field)
-            )
+            yield exceptions.ValidationError(message="Field {0} is not defined".format(extra_field))
 
 
 def definitions(header, schema, column_validators):
@@ -83,18 +80,13 @@ def exactfields(header, schema, column_validators):
     failed = [field.get('name') for field in schema.get('fields', defaults.FIELDS)] != header
 
     if failed:
-        yield exceptions.ValidationError(
-            message="Column name is different to fields.name in schema"
-        )
+        yield exceptions.ValidationError(message="Column name is different to fields.name in schema")
 
     column_validators['columns'].clear()
     for column_index, column in enumerate(header):
         field_schema = schema.get('fields', defaults.FIELDS)[column_index]
 
-        column_info = {
-            'field_schema': field_schema,
-            'column': column
-        }
+        column_info = {'field_schema': field_schema, 'column': column}
 
         _utilities.find_row_validators(column_info=column_info, field_schema=field_schema)
 
@@ -155,10 +147,7 @@ def patternfields(header, schema, column_validators):
             if not re.match(regex, column):
                 continue
 
-            new_column_info = {
-                'column': column,
-                'pattern': regex
-            }
+            new_column_info = {'column': column, 'pattern': regex}
 
             new_column_info.update(column_info)
 
@@ -175,17 +164,14 @@ def field_required(header, schema, column_validators):
         return
 
     for column_info in column_validators['columns'].values():
-        failed = column_info['field_schema'].get('required', defaults.FIELDS_REQUIRED) and column_info['column'] not in header
+        failed = column_info['field_schema'].get('required',
+                                                 defaults.FIELDS_REQUIRED) and column_info['column'] not in header
         if failed:
-            yield exceptions.ValidationError(
-                message="{0} is a required field".format(column_info['column'])
-            )
+            yield exceptions.ValidationError(message="{0} is a required field".format(column_info['column']))
 
     for column_name, column_info in column_validators['unfoundfields'].items():
         if column_info['field_schema'].get('required', defaults.FIELDS_REQUIRED):
-            yield exceptions.ValidationError(
-                message="{0} is a required field".format(column_info['column'])
-            )
+            yield exceptions.ValidationError(message="{0} is a required field".format(column_info['column']))
 
 
 HEADER_OPTIONS = {

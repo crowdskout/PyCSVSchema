@@ -5,7 +5,6 @@ from pycsvschema import exceptions
 from pycsvschema import defaults
 from pycsvschema.validators import types
 
-
 # Validators for options under `fields`
 # Each validator should be a generator, accepting three parameters:
 # :param cell: Cell
@@ -142,11 +141,7 @@ def field_nullable(cell, schema, field_schema):
     failed = cell['value'] is None
 
     if failed:
-        yield exceptions.ValidationError(
-            message="Illegal null value",
-            column=field_schema.get('name'),
-            row=cell['row']
-        )
+        yield exceptions.ValidationError(message="Illegal null value", column=field_schema.get('name'), row=cell['row'])
 
 
 def field_ref(cell, schema, field_schema):
@@ -167,7 +162,6 @@ ROW_OPTIONS = {
     'nullable': field_nullable,
     '$ref': field_ref,
 }
-
 
 # Other dependent options in fields:
 #     format
