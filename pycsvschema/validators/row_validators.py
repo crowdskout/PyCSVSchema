@@ -96,7 +96,7 @@ def field_maxlength(cell, schema, field_schema):
 
     if failed:
         yield exceptions.ValidationError(
-            message="Value {0} is longer than minLength of {1}".format(cell['value'], maxlength),
+            message="Value {0} is longer than maxLength of {1}".format(cell['value'], maxlength),
             column=field_schema.get('name'),
             row=cell['row']
         )
